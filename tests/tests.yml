@@ -1,0 +1,21 @@
+---
+- hosts: localhost
+  roles:
+  - role: standard-test-source
+    tags:
+    - always
+  - role: standard-test-basic
+    tags:
+    - atomic
+    - classic
+    required_packages:
+    - python3-dbusmock
+    - umockdev
+    tests:
+    - virtual_image:
+        dir: .
+        run: source/tests/virtual-image.py
+    - umockdev:
+        dir: .
+        run: run-umockdev.sh
+
