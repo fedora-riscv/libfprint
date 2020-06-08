@@ -1,7 +1,7 @@
 Name:           libfprint
 
-Version:        1.90.1
-Release:        2%{?dist}
+Version:        1.90.2
+Release:        1%{?dist}
 Summary:        Toolkit for fingerprint scanner
 
 License:        LGPLv2+
@@ -69,6 +69,12 @@ developing applications that use %{name}.
 %{_datadir}/gtk-doc/html/libfprint-2/
 
 %changelog
+* Mon Jun 08 2020 Benjamin Berg <bberg@redhat.com> - 1.90.2-1
+- Update to libfprint 1.90.2
+- Resolves #1832229
+- Resolves #1841834
+- Resolves #1841965
+
 * Fri Feb 14 2020 Bastien Nocera <bnocera@redhat.com> - 1.90.1-2
 + libfprint-1.90.1-2
 - Rebuilt for F32
