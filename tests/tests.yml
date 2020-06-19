@@ -9,6 +9,7 @@
     - atomic
     - classic
     required_packages:
+    - git
     - python3-dbusmock
     - umockdev
     tests:
