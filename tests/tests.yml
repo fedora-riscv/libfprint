@@ -4,12 +4,13 @@
   - role: standard-test-source
     tags:
     - always
+    required_packages:
+    - git
   - role: standard-test-basic
     tags:
     - atomic
     - classic
     required_packages:
-    - git
     - python3-dbusmock
     - umockdev
     tests:
