@@ -1,6 +1,6 @@
 Name:           libfprint
 
-Version:        1.90.6
+Version:        1.90.7
 Release:        1%{?dist}
 Summary:        Toolkit for fingerprint scanner
 
@@ -26,7 +26,6 @@ BuildRequires:  gobject-introspection-devel
 BuildRequires:  python3-cairo python3-gobject cairo-devel
 BuildRequires:  umockdev >= 0.13.2
 
-Patch000:	0001-nbis-Disable-array-parameter-and-array-bounds-warnin.patch
 
 %description
 libfprint offers support for consumer fingerprint reader devices.
@@ -71,6 +70,9 @@ developing applications that use %{name}.
 %{_datadir}/gtk-doc/html/libfprint-2/
 
 %changelog
+* Wed Jan 13 13:33:12 CET 2021 Benjamin Berg <bberg@redhat.com> - 1.90.7-1
+- Update to 1.90.7 (#1902256)
+
 * Wed Dec 09 2020 Benjamin Berg <bberg@redhat.com> - 1.90.6-1
 - New upstream release 1.90.6 (#1902256)
 
