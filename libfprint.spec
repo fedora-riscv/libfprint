@@ -1,7 +1,7 @@
 Name:           libfprint
 
-Version:        1.90.7
-Release:        2%{?dist}
+Version:        1.92.0
+Release:        1%{?dist}
 Summary:        Toolkit for fingerprint scanner
 
 License:        LGPLv2+
@@ -19,6 +19,7 @@ BuildRequires:  pkgconfig(gusb) >= 0.3.0
 BuildRequires:  pkgconfig(nss)
 BuildRequires:  pkgconfig(pixman-1)
 BuildRequires:  gtk-doc
+BuildRequires:  libgudev-devel
 # For the udev.pc to install the rules
 BuildRequires:  systemd
 BuildRequires:  gobject-introspection-devel
@@ -26,6 +27,7 @@ BuildRequires:  gobject-introspection-devel
 BuildRequires:  python3-cairo python3-gobject cairo-devel
 BuildRequires:  umockdev >= 0.13.2
 
+Patch0000: https://gitlab.freedesktop.org/libfprint/libfprint/-/merge_requests/306.patch
 
 %description
 libfprint offers support for consumer fingerprint reader devices.
@@ -59,7 +61,8 @@ developing applications that use %{name}.
 %doc NEWS TODO THANKS AUTHORS README
 %{_libdir}/*.so.*
 %{_libdir}/girepository-1.0/*.typelib
-%{_udevrulesdir}/60-libfprint-2-autosuspend.rules
+%{_udevhwdbdir}/60-autosuspend-libfprint-2.hwdb
+%{_udevrulesdir}/70-libfprint-2.rules
 
 %files devel
 %doc HACKING.md
@@ -70,6 +73,9 @@ developing applications that use %{name}.
 %{_datadir}/gtk-doc/html/libfprint-2/
 
 %changelog
+* Thu Jul 01 2021 Benjamin Berg <bberg@redhat.com> - 1.92.0-1
+- Update to 1.92.0 (#1977842)
+
 * Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.90.7-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 

@@ -1,0 +1,300 @@
+From 96afb4577986451eb41df39e4eea2b9d8f96cd7c Mon Sep 17 00:00:00 2001
+From: Benjamin Berg <bberg@redhat.com>
+Date: Thu, 1 Jul 2021 17:37:53 +0200
+Subject: [PATCH 1/8] spi: Fix pointer cast on 32bit architectures
+
+---
+ libfprint/fpi-spi-transfer.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libfprint/fpi-spi-transfer.c b/libfprint/fpi-spi-transfer.c
+index f820c53d..f5d2617d 100644
+--- a/libfprint/fpi-spi-transfer.c
++++ b/libfprint/fpi-spi-transfer.c
+@@ -323,7 +323,7 @@ transfer_chunk (FpiSpiTransfer *transfer, gsize full_length, gsize *transferred)
+     {
+       if (skip < transfer->length_wr && len < block_size)
+         {
+-          xfer[transfers].tx_buf = (guint64) transfer->buffer_wr + skip;
++          xfer[transfers].tx_buf = (gsize) transfer->buffer_wr + skip;
+           xfer[transfers].len = MIN (block_size, transfer->length_wr - skip);
+ 
+           len += xfer[transfers].len;
+@@ -340,7 +340,7 @@ transfer_chunk (FpiSpiTransfer *transfer, gsize full_length, gsize *transferred)
+     {
+       if (skip < transfer->length_rd && len < block_size)
+         {
+-          xfer[transfers].rx_buf = (guint64) transfer->buffer_rd + skip;
++          xfer[transfers].rx_buf = (gsize) transfer->buffer_rd + skip;
+           xfer[transfers].len = MIN (block_size, transfer->length_rd - skip);
+ 
+           len += xfer[transfers].len;
+-- 
+GitLab
+
+
+From 9e5cf81ef8355b1c267a883b496e580080cbf1c6 Mon Sep 17 00:00:00 2001
+From: Benjamin Berg <bberg@redhat.com>
+Date: Thu, 1 Jul 2021 17:51:07 +0200
+Subject: [PATCH 2/8] upektc_img: Fix warnings in debug format strings
+
+---
+ libfprint/drivers/upektc_img.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libfprint/drivers/upektc_img.c b/libfprint/drivers/upektc_img.c
+index 34e3b9de..19bc4158 100644
+--- a/libfprint/drivers/upektc_img.c
++++ b/libfprint/drivers/upektc_img.c
+@@ -221,7 +221,7 @@ capture_read_data_cb (FpiUsbTransfer *transfer, FpDevice *device,
+       if (response_size > transfer->actual_length)
+         {
+           fp_dbg ("response_size is %lu, actual_length is %d",
+-                  response_size, (gint) transfer->actual_length);
++                  (gulong) response_size, (gint) transfer->actual_length);
+           fp_dbg ("Waiting for rest of transfer");
+           BUG_ON (self->response_rest);
+           self->response_rest = response_size - transfer->actual_length;
+@@ -309,7 +309,7 @@ capture_read_data_cb (FpiUsbTransfer *transfer, FpDevice *device,
+                                             data);
+           BUG_ON (self->image_size != IMAGE_SIZE);
+           fp_dbg ("Image size is %lu",
+-                  self->image_size);
++                  (gulong) self->image_size);
+           img = fp_image_new (IMAGE_WIDTH, IMAGE_HEIGHT);
+           img->flags |= FPI_IMAGE_PARTIAL;
+           memcpy (img->data, self->image_bits,
+-- 
+GitLab
+
+
+From 8edfd4203c72924e9dd3377a2f3e19174339e6fc Mon Sep 17 00:00:00 2001
+From: Benjamin Berg <bberg@redhat.com>
+Date: Thu, 1 Jul 2021 18:27:13 +0200
+Subject: [PATCH 3/8] upektc: Fix format string on architectures where 64bit is
+ not long
+
+---
+ libfprint/drivers/upektc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libfprint/drivers/upektc.c b/libfprint/drivers/upektc.c
+index c8113f6c..115e6b60 100644
+--- a/libfprint/drivers/upektc.c
++++ b/libfprint/drivers/upektc.c
+@@ -411,7 +411,7 @@ dev_init (FpImageDevice *dev)
+       break;
+ 
+     default:
+-      fp_err ("Device variant %lu is not known", driver_data);
++      fp_err ("Device variant %" G_GUINT64_FORMAT " is not known", driver_data);
+       g_assert_not_reached ();
+       fpi_image_device_open_complete (dev, fpi_device_error_new (FP_DEVICE_ERROR_GENERAL));
+       return;
+-- 
+GitLab
+
+
+From 78b1b679d79e0af0c17f8450b034b267ba837783 Mon Sep 17 00:00:00 2001
+From: Benjamin Berg <bberg@redhat.com>
+Date: Tue, 6 Jul 2021 20:48:12 +0200
+Subject: [PATCH 4/8] upeksonly: Fix format string warning by using unsigned
+
+There is no need to use size_t for num_rows as it is capped to NUM_ROWS
+which is defined to 2048.
+---
+ libfprint/drivers/upeksonly.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/libfprint/drivers/upeksonly.c b/libfprint/drivers/upeksonly.c
+index 5b2ffdf5..9d93cc76 100644
+--- a/libfprint/drivers/upeksonly.c
++++ b/libfprint/drivers/upeksonly.c
+@@ -79,7 +79,7 @@ struct _FpiDeviceUpeksonly
+   int                              num_flying;
+ 
+   GSList                          *rows;
+-  size_t                           num_rows;
++  unsigned                         num_rows;
+   unsigned char                   *rowbuf;
+   int                              rowbuf_offset;
+ 
+@@ -215,7 +215,7 @@ handoff_img (FpImageDevice *dev)
+ 
+   self->rows = g_slist_reverse (self->rows);
+ 
+-  fp_dbg ("%lu rows", self->num_rows);
++  fp_dbg ("%u rows", self->num_rows);
+   img = fpi_assemble_lines (&self->assembling_ctx, self->rows, self->num_rows);
+ 
+   g_slist_free_full (self->rows, g_free);
+@@ -295,7 +295,7 @@ row_complete (FpImageDevice *dev)
+           if (self->num_blank > FINGER_REMOVED_THRESHOLD)
+             {
+               self->finger_state = FINGER_REMOVED;
+-              fp_dbg ("detected finger removal. Blank rows: %d, Full rows: %lu",
++              fp_dbg ("detected finger removal. Blank rows: %d, Full rows: %u",
+                       self->num_blank, self->num_rows);
+               handoff_img (dev);
+               return;
+-- 
+GitLab
+
+
+From 90b466f122aa74b58807e56720cd49f3b317a709 Mon Sep 17 00:00:00 2001
+From: Benjamin Berg <bberg@redhat.com>
+Date: Tue, 6 Jul 2021 20:55:00 +0200
+Subject: [PATCH 5/8] upekts: Fix format strings
+
+---
+ libfprint/drivers/upekts.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/libfprint/drivers/upekts.c b/libfprint/drivers/upekts.c
+index 1f1b1810..3d82cb33 100644
+--- a/libfprint/drivers/upekts.c
++++ b/libfprint/drivers/upekts.c
+@@ -366,7 +366,7 @@ read_msg_cb (FpiUsbTransfer *transfer, FpDevice *device,
+       fp_err ("async msg read too short (%d)",
+               (gint) transfer->actual_length);
+       error = fpi_device_error_new_msg (FP_DEVICE_ERROR_PROTO,
+-                                        "Packet from device was too short (%lu)",
++                                        "Packet from device was too short (%" G_GSSIZE_FORMAT ")",
+                                         transfer->actual_length);
+       goto err;
+     }
+@@ -993,7 +993,7 @@ e_handle_resp00 (FpDevice *dev, unsigned char *data,
+ 
+   if (data_len != 14)
+     {
+-      fp_err ("received 3001 poll response of %lu bytes?", data_len);
++      fp_err ("received 3001 poll response of %" G_GSIZE_FORMAT " bytes?", data_len);
+       do_enroll_stop (dev, NULL,
+                       fpi_device_error_new_msg (FP_DEVICE_ERROR_PROTO,
+                                                 "received 3001 response with wrong length"));
+@@ -1090,7 +1090,7 @@ e_handle_resp02 (FpDevice *dev, unsigned char *data,
+ 
+   if (data_len < sizeof (scan_comp))
+     {
+-      fp_err ("fingerprint data too short (%lu bytes)", data_len);
++      fp_err ("fingerprint data too short (%" G_GSIZE_FORMAT "u bytes)", data_len);
+       error = fpi_device_error_new_msg (FP_DEVICE_ERROR_PROTO, "fingerprint data too short");
+     }
+   else if (memcmp (data, scan_comp, sizeof (scan_comp)) != 0)
+@@ -1318,7 +1318,7 @@ v_handle_resp00 (FpDevice *dev, unsigned char *data,
+ 
+   if (data_len != 14)
+     {
+-      fp_warn ("received 3001 poll response of %lu bytes?", data_len);
++      fp_warn ("received 3001 poll response of %" G_GSIZE_FORMAT "u bytes?", data_len);
+       error = fpi_device_error_new (FP_DEVICE_ERROR_PROTO);
+       goto out;
+     }
+-- 
+GitLab
+
+
+From b872367aff0c0580318c9159c105a06ea849e613 Mon Sep 17 00:00:00 2001
+From: Benjamin Berg <bberg@redhat.com>
+Date: Tue, 6 Jul 2021 20:55:23 +0200
+Subject: [PATCH 6/8] virtual-device: Fix format strings
+
+---
+ libfprint/drivers/virtual-device.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libfprint/drivers/virtual-device.c b/libfprint/drivers/virtual-device.c
+index effcd593..1743692b 100644
+--- a/libfprint/drivers/virtual-device.c
++++ b/libfprint/drivers/virtual-device.c
+@@ -192,7 +192,7 @@ process_cmds (FpDeviceVirtualDevice * self,
+         {
+           guint64 sleep_ms = g_ascii_strtoull (cmd + strlen (SLEEP_CMD_PREFIX), NULL, 10);
+ 
+-          g_debug ("Sleeping %lums", sleep_ms);
++          g_debug ("Sleeping %" G_GUINT64_FORMAT "ms", sleep_ms);
+           self->sleep_timeout_id = g_timeout_add (sleep_ms, sleep_timeout_cb, self);
+ 
+           return FALSE;
+@@ -275,7 +275,7 @@ recv_instruction_cb (GObject      *source_object,
+   gsize bytes;
+ 
+   bytes = fpi_device_virtual_listener_read_finish (listener, res, &error);
+-  fp_dbg ("Got instructions of length %ld", bytes);
++  fp_dbg ("Got instructions of length %" G_GSIZE_FORMAT, bytes);
+ 
+   if (error)
+     {
+-- 
+GitLab
+
+
+From 7bdb96f3df16e80432c7d0488762d0551cddc252 Mon Sep 17 00:00:00 2001
+From: Benjamin Berg <bberg@redhat.com>
+Date: Tue, 6 Jul 2021 22:49:15 +0200
+Subject: [PATCH 7/8] aesx660: Fix format strings
+
+---
+ libfprint/drivers/aesx660.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/libfprint/drivers/aesx660.c b/libfprint/drivers/aesx660.c
+index fb786600..dc0bc0de 100644
+--- a/libfprint/drivers/aesx660.c
++++ b/libfprint/drivers/aesx660.c
+@@ -365,7 +365,7 @@ capture_read_stripe_data_cb (FpiUsbTransfer *transfer,
+       return;
+     }
+ 
+-  fp_dbg ("Got %lu bytes of data", actual_length);
++  fp_dbg ("Got %" G_GSIZE_FORMAT " bytes of data", actual_length);
+   while (actual_length)
+     {
+       gssize payload_length;
+@@ -386,7 +386,7 @@ capture_read_stripe_data_cb (FpiUsbTransfer *transfer,
+                        (priv->stripe_packet->data[AESX660_RESPONSE_SIZE_MSB_OFFSET] << 8);
+       fp_dbg ("Got frame, type %.2x payload of size %.4lx",
+               priv->stripe_packet->data[AESX660_RESPONSE_TYPE_OFFSET],
+-              payload_length);
++              (long) payload_length);
+ 
+       still_needed_len = MAX (0, AESX660_HEADER_SIZE + payload_length - (gssize) priv->stripe_packet->len);
+       copy_len = MIN (actual_length, still_needed_len);
+@@ -441,7 +441,7 @@ capture_run_state (FpiSsm *ssm, FpDevice *_dev)
+       break;
+ 
+     case CAPTURE_SET_IDLE:
+-      fp_dbg ("Got %lu frames", priv->strips_len);
++      fp_dbg ("Got %" G_GSIZE_FORMAT " frames", priv->strips_len);
+       aesX660_send_cmd (ssm, _dev, set_idle_cmd, sizeof (set_idle_cmd),
+                         capture_set_idle_cmd_cb);
+       break;
+-- 
+GitLab
+
+
+From 94dbcc3d0da5e121a59f8fe634bae3d56a070464 Mon Sep 17 00:00:00 2001
+From: Benjamin Berg <bberg@redhat.com>
+Date: Tue, 6 Jul 2021 22:49:23 +0200
+Subject: [PATCH 8/8] elanspi: Fix format string
+
+---
+ libfprint/drivers/elanspi.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libfprint/drivers/elanspi.c b/libfprint/drivers/elanspi.c
+index fab958b6..daea67c3 100644
+--- a/libfprint/drivers/elanspi.c
++++ b/libfprint/drivers/elanspi.c
+@@ -1219,7 +1219,7 @@ elanspi_guess_image (FpiDeviceElanSpi *self, guint16 *raw_image)
+ 
+   sq_stddev /= (frame_width * frame_height);
+ 
+-  fp_dbg ("<guess> stddev=%ld, ip=%d, is_fp=%d, is_empty=%d", sq_stddev, invalid_percent, is_fp, is_empty);
++  fp_dbg ("<guess> stddev=%" G_GUINT64_FORMAT "d, ip=%d, is_fp=%d, is_empty=%d", sq_stddev, invalid_percent, is_fp, is_empty);
+ 
+   if (invalid_percent < ELANSPI_MAX_REAL_INVALID_PERCENT)
+     is_fp += 1;
+-- 
+GitLab
+
