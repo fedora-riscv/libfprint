@@ -1,7 +1,7 @@
 Name:           libfprint
 
 Version:        1.90.7
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Toolkit for fingerprint scanner
 
 License:        LGPLv2+
@@ -26,6 +26,7 @@ BuildRequires:  gobject-introspection-devel
 BuildRequires:  python3-cairo python3-gobject cairo-devel
 BuildRequires:  umockdev >= 0.13.2
 
+Patch0000:      update-goodix.patch
 
 %description
 libfprint offers support for consumer fingerprint reader devices.
@@ -70,6 +71,9 @@ developing applications that use %{name}.
 %{_datadir}/gtk-doc/html/libfprint-2/
 
 %changelog
+* Thu Jul 08 2021 Benjamin Berg <bberg@redhat.com> - 1.90.7-3
+- Pull in some upstream libfprint fixes for goodix
+
 * Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.90.7-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
