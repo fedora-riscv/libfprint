@@ -56,7 +56,7 @@ developing applications that use %{name}.
 %ldconfig_scriptlets
 
 %check
-%meson_test
+%meson_test -t 4
 
 %files
 %license COPYING
@@ -77,6 +77,7 @@ developing applications that use %{name}.
 %changelog
 * Mon Jul 26 2021 Benjamin Berg <bberg@redhat.com> - 1.92.0-3
 - Add patch disabling timeouts in virtual-device to enable fedora CI
+- Increase timeout of tests by factor 4
 
 * Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.92.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
