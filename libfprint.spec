@@ -1,7 +1,7 @@
 Name:           libfprint
 
-Version:        1.92.0
-Release:        3%{?dist}
+Version:        1.94.0
+Release:        1%{?dist}
 Summary:        Toolkit for fingerprint scanner
 
 License:        LGPLv2+
@@ -26,10 +26,6 @@ BuildRequires:  gobject-introspection-devel
 # For internal CI tests; umockdev 0.13.2 has an important locking fix
 BuildRequires:  python3-cairo python3-gobject cairo-devel
 BuildRequires:  umockdev >= 0.13.2
-
-Patch0000: https://gitlab.freedesktop.org/libfprint/libfprint/-/merge_requests/306.patch
-
-Patch9999: 0001-virtual-device-Do-not-time-out-when-waiting-for-SCAN.patch
 
 %description
 libfprint offers support for consumer fingerprint reader devices.
@@ -75,6 +71,10 @@ developing applications that use %{name}.
 %{_datadir}/gtk-doc/html/libfprint-2/
 
 %changelog
+* Fri Aug 20 2021 Benjamin Berg <bberg@redhat.com> - 1.94.0-1
+- Update to 1.94.0 (#1977842)
+  Related: #1894694
+
 * Mon Jul 26 2021 Benjamin Berg <bberg@redhat.com> - 1.92.0-3
 - Add patch disabling timeouts in virtual-device to enable fedora CI
 - Increase timeout of tests by factor 4
