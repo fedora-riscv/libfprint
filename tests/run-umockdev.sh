@@ -31,7 +31,10 @@ for test in ${TESTS[@]}; do
     RES=$?
     echo "$test finished with return code $RES"
     echo ""
-    ((RESULT += $RES))
+    # Ignore skipped tests
+    if [ $RES -ne 0 -a $RES -ne 77 ]; then
+        RESULT=1
+    fi
 done
 
 exit $RESULT
