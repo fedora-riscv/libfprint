@@ -1,6 +1,6 @@
 Name:           libfprint
 
-Version:        1.94.0
+Version:        1.94.1
 Release:        1%{?dist}
 Summary:        Toolkit for fingerprint scanner
 
@@ -71,6 +71,9 @@ developing applications that use %{name}.
 %{_datadir}/gtk-doc/html/libfprint-2/
 
 %changelog
+* Fri Sep 24 2021 Benjamin Berg <bberg@redhat.com> - 1.94.1-1
+- Update to 1.94.1
+
 * Fri Aug 20 2021 Benjamin Berg <bberg@redhat.com> - 1.94.0-1
 - Update to 1.94.0 (#1977842)
   Related: #1894694
