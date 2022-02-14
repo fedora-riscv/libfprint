@@ -1,6 +1,6 @@
 Name:           libfprint
 
-Version:        1.94.2
+Version:        1.94.3
 Release:        %autorelease
 Summary:        Toolkit for fingerprint scanner
 
@@ -56,7 +56,7 @@ developing applications that use %{name}.
 
 %files
 %license COPYING
-%doc NEWS TODO THANKS AUTHORS README
+%doc NEWS THANKS AUTHORS README.md
 %{_libdir}/*.so.*
 %{_libdir}/girepository-1.0/*.typelib
 %{_udevhwdbdir}/60-autosuspend-libfprint-2.hwdb
