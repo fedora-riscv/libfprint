@@ -43,7 +43,7 @@ developing applications that use %{name}.
 
 %build
 # Include the virtual image driver for integration tests
-%meson -Dx11-examples=false -Ddrivers=all
+%meson -Ddrivers=all
 %meson_build
 
 %install
